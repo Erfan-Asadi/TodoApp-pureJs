@@ -1,12 +1,28 @@
-const todo_items = document.querySelectorAll('.todo-list .todo-item');
 const check_sound = new Audio("sounds/click-audio.mp3");
-
 let todoEditingState = false;
-for (let item of todo_items) {
-    item.querySelector(".container-left").addEventListener("click", toggleCheckTask);
-    item.querySelector(".container-left").addEventListener("click", updateCompletedTasksCount);
 
+function setHandlersforTodoItem() {
+    const todo_items = document.querySelectorAll('.todo-item');
+
+    for (let todo of todo_items) {
+        todo.querySelector('.container-left').addEventListener("click", toggleCheckTask)
+        todo.addEventListener("click", updateCompletedTasksCount);
+        todo.querySelector('.container-right').addEventListener("click", toggleTodoOption)
+    }
+
+    const removeTodo_buttons = document.querySelectorAll(".remove-todo");
+    for (let button of removeTodo_buttons) {
+        button.addEventListener("click", removeTodoItem);
+    }
+
+    const editTodo_buttons = document.querySelectorAll(".edit-todo");
+    for (let button of editTodo_buttons) {
+        button.addEventListener("click", editTodoItem);
+    }
 }
+setHandlersforTodoItem();
+
+
 
 function toggleCheckTask(e) {
     if (todoEditingState) return;
@@ -50,17 +66,12 @@ function updateCompletedTasksCount() {
 function updateAllTasksCount() {
     const all_tasks = document.querySelectorAll('.todo-list .todo-item').length;
     const all_tasks_count = document.querySelector('.all-tasks-count');
-    console.log(all_tasks)
+
     all_tasks_count.innerHTML = `/ ${all_tasks}`;
 }
 updateAllTasksCount();
 
 
-
-const todoItem_containerRight = document.querySelectorAll(".todo-item .container-right");
-for (let item of todoItem_containerRight) {
-    item.addEventListener("click", toggleTodoOption);
-}
 
 function toggleTodoOption(e) {
     let closest_todo = e.target.closest(".todo-item");
@@ -81,10 +92,6 @@ function toggleTodoOption(e) {
 }
 
 
-const removeTodo_buttons = document.querySelectorAll(".remove-todo");
-for (let button of removeTodo_buttons) {
-    button.addEventListener("click", removeTodoItem);
-}
 
 function removeTodoItem(e) {
     if (todoEditingState) return;
@@ -95,10 +102,7 @@ function removeTodoItem(e) {
     updateAllTasksCount();
 }
 
-const editTodo_buttons = document.querySelectorAll(".edit-todo");
-for (let button of editTodo_buttons) {
-    button.addEventListener("click", editTodoItem);
-}
+
 
 function editTodoItem(e) {
     if (todoEditingState) return;
@@ -126,28 +130,79 @@ showUncheckedTasks_button.addEventListener('click', showUncheckedTasks);
 
 function showCheckedTasks() {
     const all_tasks = document.querySelectorAll('.todo-list .todo-item');
-    for(let task of all_tasks) {
-        if(task.classList.contains('completed')) {
-            task.style.display = '';
-            continue;
-        } 
-        task.style.display = 'none';
-    }
-}
-function showUncheckedTasks() {
-    const all_tasks = document.querySelectorAll('.todo-list .todo-item');
-    for(let task of all_tasks) {
-        if(!task.classList.contains('completed')) {
+    for (let task of all_tasks) {
+        if (task.classList.contains('completed')) {
             task.style.display = '';
             continue;
         }
         task.style.display = 'none';
     }
 }
+
+function showUncheckedTasks() {
+    const all_tasks = document.querySelectorAll('.todo-list .todo-item');
+    for (let task of all_tasks) {
+        if (!task.classList.contains('completed')) {
+            task.style.display = '';
+            continue;
+        }
+        task.style.display = 'none';
+    }
+}
+
 function showAllTasks() {
     const all_tasks = document.querySelectorAll('.todo-list .todo-item');
-    for(let task of all_tasks) {
-        
+    for (let task of all_tasks) {
+
         task.style.display = '';
     }
+}
+
+
+// add new task
+
+// toggle form-toggler button by click
+const form_toggler_button = document.querySelector('button.form-toggler');
+const addTask_button = document.querySelector('.add-task-button');
+form_toggler_button.addEventListener('click', showHideForm);
+addTask_button.addEventListener('click', getNewTaskValue);
+
+function showHideForm(e) {
+    e.target.closest('.form-toggler').classList.toggle('active');
+    e.target.closest('.todo').querySelector('.todo__bottomSection').classList.toggle('expand');
+    playCheckSound();
+}
+
+
+function getNewTaskValue(e) {
+    let inputValue = e.target.closest('form').querySelector('.new-task-value').value;
+    let newTask = makeTodoItem(inputValue);
+    addNewTaskToList(newTask);
+}
+
+function makeTodoItem(value = 'Unknown') {
+    let todoItem = `
+    <li class="todo-item">
+        <div class="container-left">
+            <span class="custom-radio fa fa-check"></span>
+            <p class="subject">${value}</p>
+        </div>
+        <div class="container-right">
+            <i class="fa fa-chevron-right"></i>
+            <div class="todo-options">
+                <i class="fa fa-times remove-todo"></i>
+                <i class="fa fa-pen edit-todo"></i>
+            </div>
+        </div>
+    </li>
+    `;
+
+    return todoItem;
+}
+
+function addNewTaskToList(newTask) {
+    const todoList = document.querySelector('.todo-list');
+    todoList.insertAdjacentHTML('beforeend', newTask);
+    updateAllTasksCount();
+    setHandlersforTodoItem();
 }
