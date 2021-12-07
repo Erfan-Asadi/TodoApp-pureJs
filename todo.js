@@ -5,17 +5,20 @@ function setHandlersforTodoItem() {
     const todo_items = document.querySelectorAll('.todo-item');
 
     for (let todo of todo_items) {
-        todo.querySelector('.container-left').addEventListener("click", toggleCheckTask)
         todo.addEventListener("click", updateCompletedTasksCount);
+        todo.querySelector('.container-left').addEventListener("click", toggleCheckTask)
         todo.querySelector('.container-right').addEventListener("click", toggleTodoOption)
     }
 
+
+    // set handlers to buttons that inside the todo item
+
     const removeTodo_buttons = document.querySelectorAll(".remove-todo");
+    const editTodo_buttons = document.querySelectorAll(".edit-todo");
+
     for (let button of removeTodo_buttons) {
         button.addEventListener("click", removeTodoItem);
     }
-
-    const editTodo_buttons = document.querySelectorAll(".edit-todo");
     for (let button of editTodo_buttons) {
         button.addEventListener("click", editTodoItem);
     }
@@ -23,7 +26,7 @@ function setHandlersforTodoItem() {
 setHandlersforTodoItem();
 
 
-
+// checked-unchecked todo item 
 function toggleCheckTask(e) {
     if (todoEditingState) return;
     let todo_item = e.target.closest(".todo-item");
@@ -72,7 +75,7 @@ function updateAllTasksCount() {
 updateAllTasksCount();
 
 
-
+//show-hide right option box inside each todo item
 function toggleTodoOption(e) {
     let closest_todo = e.target.closest(".todo-item");
 
@@ -153,7 +156,6 @@ function showUncheckedTasks() {
 function showAllTasks() {
     const all_tasks = document.querySelectorAll('.todo-list .todo-item');
     for (let task of all_tasks) {
-
         task.style.display = '';
     }
 }
@@ -164,6 +166,7 @@ function showAllTasks() {
 // toggle form-toggler button by click
 const form_toggler_button = document.querySelector('button.form-toggler');
 const addTask_button = document.querySelector('.add-task-button');
+
 form_toggler_button.addEventListener('click', showHideForm);
 addTask_button.addEventListener('click', getNewTaskValue);
 
@@ -175,9 +178,13 @@ function showHideForm(e) {
 
 
 function getNewTaskValue(e) {
-    let inputValue = e.target.closest('form').querySelector('.new-task-value').value;
-    let newTask = makeTodoItem(inputValue);
+    let input = e.target.closest('form').querySelector('.new-task-value');
+    let trimed_value = input.value.trim(); // remove spaces before-after the string
+
+    if(!trimed_value) return;
+    let newTask = makeTodoItem(trimed_value);
     addNewTaskToList(newTask);
+    input.value = null;
 }
 
 function makeTodoItem(value = 'Unknown') {
